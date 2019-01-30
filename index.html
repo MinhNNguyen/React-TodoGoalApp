@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Udacity Todos Goals</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"></script>
 </head>
+
 <body>
   <div>
     <h1>Todo List</h1>
@@ -19,8 +21,8 @@
   </div>
 
   <script type='text/javascript'>
-    
-    function generateId () {
+
+    function generateId() {
       return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
     }
 
@@ -32,80 +34,107 @@
     const REMOVE_GOAL = 'REMOVE_GOAL'
     const TOGGLE_GOAL = 'TOGGLE_GOAL'
 
-    function addTodoAction (todo) {
+    function addTodoAction(todo) {
       return {
         type: ADD_TODO,
         todo,
       }
     }
 
-    function removeTodoAction (id) {
+    function removeTodoAction(id) {
       return {
         type: REMOVE_TODO,
         id,
       }
     }
 
-    function toggleTodoAction (id) {
+    function toggleTodoAction(id) {
       return {
         type: TOGGLE_TODO,
         id,
       }
     }
 
-    function addGoalAction (goal) {
+    function addGoalAction(goal) {
       return {
         type: ADD_GOAL,
         goal,
       }
     }
 
-    function removeGoalAction (id) {
+    function removeGoalAction(id) {
       return {
         type: REMOVE_GOAL,
         id,
       }
     }
 
-    function toggleGoalAction (id) {
+    function toggleGoalAction(id) {
       return {
         type: TOGGLE_GOAL,
         id,
       }
     }
 
-    function todos (state = [], action) {
-      switch(action.type) {
-        case ADD_TODO :
+    function todos(state = [], action) {
+      switch (action.type) {
+        case ADD_TODO:
           return state.concat([action.todo])
-        case REMOVE_TODO :
+        case REMOVE_TODO:
           return state.filter((todo) => todo.id !== action.id)
-        case TOGGLE_TODO :
+        case TOGGLE_TODO:
           return state.map((todo) => todo.id !== action.id ? todo :
             Object.assign({}, todo, { complete: !todo.complete }))
-        default :
+        default:
           return state
       }
     }
 
-    function goals (state = [], action) {
-      switch(action.type) {
-        case ADD_GOAL :
+    function goals(state = [], action) {
+      switch (action.type) {
+        case ADD_GOAL:
           return state.concat([action.goal])
-        case REMOVE_GOAL :
+        case REMOVE_GOAL:
           return state.filter((goal) => goal.id !== action.id)
-        case TOGGLE_GOAL :
+        case TOGGLE_GOAL:
           return state.map((goal) => goal.id !== action.id ? goal :
-            Object.assign({}, goal, { complete: !goal.complete}))
-        default :
+            Object.assign({}, goal, { complete: !goal.complete }))
+        default:
           return state
       }
+    }
+
+    const checker = (store) => (next) => (action) => {
+      if (
+        action.type === ADD_TODO &&
+        action.todo.name.toLowerCase().includes('bitcoin')
+      ) {
+        return alert("Nope. That's a bad idea")
+      }
+
+      if (
+        action.type === ADD_GOAL &&
+        action.goal.name.toLowerCase().includes('bitcoin')
+      ) {
+        return alert("Nope. That's a bad idea")
+      }
+
+      return next(action)
+    }
+
+    const logger = (store) => (next) => (action) => {
+      console.group(action.type)
+        console.log('The action: ', action)
+        const result = next(action)
+        console.log('The new state: ', store.getState())
+      console.groupEnd()
+      return result
     }
 
     const store = Redux.createStore(Redux.combineReducers({
       todos,
       goals,
-    }))
+    }), Redux.applyMiddleware(checker, logger))
 
     store.subscribe(() => {
       const { goals, todos } = store.getState()
@@ -116,7 +145,7 @@
     })
 
     // DOM code
-    function addTodo () {
+    function addTodo() {
       const input = document.getElementById('todo')
       const name = input.value
       input.value = ''
@@ -127,7 +156,7 @@
       }))
     }
 
-    function addGoal () {
+    function addGoal() {
       const input = document.getElementById('goal')
       const name = input.value
       input.value = ''
@@ -143,14 +172,14 @@
     document.getElementById('goalBtn')
       .addEventListener('click', addGoal)
 
-    function createRemoveButton (onClick) {
+    function createRemoveButton(onClick) {
       const removeBtn = document.createElement('button')
       removeBtn.innerHTML = 'X'
       removeBtn.addEventListener('click', onClick)
       return removeBtn
     }
 
-    function addTodoToDOM (todo) {
+    function addTodoToDOM(todo) {
       const node = document.createElement('li')
       const text = document.createTextNode(todo.name)
       const removeBtn = createRemoveButton(() => {
@@ -166,7 +195,7 @@
         .appendChild(node)
     }
 
-    function addGoalToDOM (goal) {
+    function addGoalToDOM(goal) {
       const node = document.createElement('li')
       const text = document.createTextNode(goal.name)
       const removeBtn = createRemoveButton(() => {
@@ -183,4 +212,5 @@
     }
   </script>
 </body>
+
 </html>
